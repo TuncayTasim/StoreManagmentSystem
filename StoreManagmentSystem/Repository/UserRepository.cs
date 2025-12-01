@@ -29,6 +29,7 @@ namespace StoreManagmentSystem.Repository
                 Password = user.Password
             };
 
+
             await _context.Users.AddAsync(NewUser);
             await SaveChangesAsync();
             return NewUser;
@@ -48,6 +49,10 @@ namespace StoreManagmentSystem.Repository
         public async Task<User> GetUserById(Guid Id)
         {
             return await _context.Users.FindAsync(Id);
+        }
+        public async Task<User> GetUserByEmail(string Email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == Email);
         }
         public async Task SaveChangesAsync()
         {

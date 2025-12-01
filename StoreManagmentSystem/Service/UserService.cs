@@ -1,6 +1,10 @@
-﻿using StoreManagmentSystem.Data.Entities;
+﻿using Microsoft.IdentityModel.Tokens;
+using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Repository;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace StoreManagmentSystem.Service
@@ -15,6 +19,7 @@ namespace StoreManagmentSystem.Service
 
         public async Task<User> AddUser(User user)
         {
+            user.Password = HashPassword(user.Password);
             await _userRepository.AddUser(user);
             return user;
         }
@@ -41,6 +46,10 @@ namespace StoreManagmentSystem.Service
         {
             return await _userRepository.GetUserById(UserId);
         }
+        public async Task<User> GetUserByEmail(string Email)
+        {
+            return await _userRepository.GetUserByEmail(Email);
+        }
 
         public async Task<User> UpdateUser(Guid UserId, User newUserInfo)
         {
@@ -61,6 +70,66 @@ namespace StoreManagmentSystem.Service
 
             await _userRepository.UpdateUser(user);
             return user;
+        }
+
+
+        public string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public bool VerifyPassword(string password, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        }
+
+
+        public string GetToken(User User, string password)
+        {
+            bool isValid = VerifyPassword(password, User.Password);
+
+            if (!isValid)
+            {
+                return null;
+            }
+
+            var secret = Environment.GetEnvironmentVariable("JWT");
+            var key = Encoding.ASCII.GetBytes(secret);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, User.UserName),
+                    new Claim(ClaimTypes.Role, User.RoleId.ToString())
+                }),
+
+                Expires = DateTime.UtcNow.AddMinutes(5),
+
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var encodedToken = tokenHandler.WriteToken(token);
+
+            return encodedToken;
+        }
+
+        public async Task<User> UpdateUserPassword(User userToUpdate, string currentPass, string newUserPassword)
+        {
+            bool isValid = VerifyPassword(currentPass, userToUpdate.Password);
+
+            if (!isValid)
+            {
+                return null;
+            }
+
+            userToUpdate.Password = HashPassword(newUserPassword);
+
+
+            await _userRepository.UpdateUser(userToUpdate);
+            return userToUpdate;
         }
     }
 }
