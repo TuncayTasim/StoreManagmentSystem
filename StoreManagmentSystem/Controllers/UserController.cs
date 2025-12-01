@@ -28,6 +28,7 @@ namespace StoreManagmentSystem.Controllers
             return await _userService.GetUserById(UserId);
         }
 
+
         [HttpPost]
         public async Task<ActionResult> AddUser(User user)
         {
@@ -59,6 +60,41 @@ namespace StoreManagmentSystem.Controllers
             }
 
             return Ok(updatedUser);
+        }
+
+        [HttpPost("Log in")]
+        public async Task<ActionResult<User>> Login(string email, string loginPassword)
+        {
+            var user = await _userService.GetUserByEmail(email);
+            if (user == null)
+            {
+                return NotFound($"User with this email was not found");
+            }
+
+            var token = _userService.GetToken(user, loginPassword);
+
+            if (token == null)
+                return BadRequest(new { message = "User name or password is incorrect" });
+
+            return Ok(token);
+        }
+
+        [HttpPut("Update password")]
+        public async Task<ActionResult> UpdateUserPassword(string email, string currentPass, string newUserPassword)
+        {
+            var userToChangePass = await _userService.GetUserByEmail(email);
+            
+            if (userToChangePass == null)
+            {
+                return NotFound($"User with this email was not found");
+            }
+            var newPassUser = await _userService.UpdateUserPassword(userToChangePass, currentPass, newUserPassword);
+            if (newPassUser == null)
+            {
+                return Unauthorized($"Тhe entered current passoword is not correct");
+            }
+            return Ok();
+            
         }
     }
 }

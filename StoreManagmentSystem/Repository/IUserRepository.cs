@@ -11,5 +11,6 @@ namespace StoreManagmentSystem.Repository
         Task<User> GetUserById(Guid Id);
 
         Task SaveChangesAsync();
+        Task<User> GetUserByEmail(string Email);
     }
 }

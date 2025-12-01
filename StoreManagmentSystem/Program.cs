@@ -1,12 +1,36 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using StoreManagmentSystem;
+using Microsoft.IdentityModel.Tokens;
 using StoreManagmentSystem.Data;
-using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Repository;
 using StoreManagmentSystem.Service;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
+
+//JWT Authentication
+var secret = Environment.GetEnvironmentVariable("JWT");
+var key = Encoding.ASCII.GetBytes(secret);
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = true;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
+
 
 //database connection
 builder.Services.AddDbContext<AppDbContext>(options =>
