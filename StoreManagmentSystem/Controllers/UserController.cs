@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StoreManagmentSystem.Data.Entities;
+using StoreManagmentSystem.Data.Models;
 using StoreManagmentSystem.Service;
 
 namespace StoreManagmentSystem.Controllers
@@ -15,28 +16,31 @@ namespace StoreManagmentSystem.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("GetAllUsers")]
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             return await _userService.GetAllUsers();
         }
 
-        [HttpGet("{UserId}")]
-
-        public async Task<ActionResult<User>> GetUserById(Guid UserId)
+        [Authorize(Roles = "Admin")]
+        [HttpGet("GetUserById/{UserId}")]
+        public async Task<ActionResult<UserModelWithRole>> GetUserById(Guid UserId)
         {
-            return await _userService.GetUserById(UserId);
+            return await _userService.GetModelById(UserId);
         }
 
-
-        [HttpPost]
-        public async Task<ActionResult> AddUser(User user)
+        [HttpPost("AddUser")]
+        public async Task<ActionResult> AddUser(UserModelWithPass user)
         {
             await _userService.AddUser(user);
-            return Ok();
+            await _userService.RequestEmailConfirm(user.Email);
+            return Ok("User successfully added.");
+            
         }
 
-        [HttpDelete("{UserId}")]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("DeleteUser/{UserId}")]
         public async Task<ActionResult> DeleteUser(Guid UserId)
         {
             var userToDelate = await _userService.DeleteUser(UserId);
@@ -45,12 +49,13 @@ namespace StoreManagmentSystem.Controllers
                 return NotFound($"User with ID {UserId} was not found.");
             }
 
-            return NoContent();
+            return Ok($"User with ID: {UserId} successfully deleted.");
         }
 
-        [HttpPut("{UserId}")]
 
-        public async Task<ActionResult> UpdateUser(Guid UserId, User newUserInfo)
+        [Authorize(Roles = "Admin,Salesman")]
+        [HttpPut("UpdateUser/{UserId}")]
+        public async Task<ActionResult> UpdateUser(Guid UserId, UserModelToChange newUserInfo)
         {
             var updatedUser = await _userService.UpdateUser(UserId, newUserInfo);
 
@@ -62,7 +67,21 @@ namespace StoreManagmentSystem.Controllers
             return Ok(updatedUser);
         }
 
-        [HttpPost("Log in")]
+        [Authorize(Roles = "Admin")]
+        [HttpPut("UpdateRole/{UserId}")]
+        public async Task<ActionResult> UpdateUserRole(Guid UserId, string newRole)
+        {
+            var updatedUser = await _userService.UpdateUserRole(UserId, newRole);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {UserId} was not found.");
+            }
+
+            return Ok("Role successfully updated.");
+        }
+
+        [HttpPost("LogIn")]
         public async Task<ActionResult<User>> Login(string email, string loginPassword)
         {
             var user = await _userService.GetUserByEmail(email);
@@ -71,7 +90,7 @@ namespace StoreManagmentSystem.Controllers
                 return NotFound($"User with this email was not found");
             }
 
-            var token = _userService.GetToken(user, loginPassword);
+            var token = _userService.GetJWTToken(user, loginPassword);
 
             if (token == null)
                 return BadRequest(new { message = "User name or password is incorrect" });
@@ -79,7 +98,8 @@ namespace StoreManagmentSystem.Controllers
             return Ok(token);
         }
 
-        [HttpPut("Update password")]
+        [Authorize(Roles = "Admin,Salesman")]
+        [HttpPut("UpdatePassword")]
         public async Task<ActionResult> UpdateUserPassword(string email, string currentPass, string newUserPassword)
         {
             var userToChangePass = await _userService.GetUserByEmail(email);
@@ -93,8 +113,55 @@ namespace StoreManagmentSystem.Controllers
             {
                 return Unauthorized($"Тhe entered current passoword is not correct");
             }
-            return Ok();
+            return Ok("Password successfully updated.");
             
+        }
+
+
+        [HttpPost("RequestResetPassword")]
+        public async Task<IActionResult> RequestReset(string email)
+        {
+            var link = await _userService.RequestPasswordReset(email);
+
+            if (link == null)
+                return NotFound("User not found.");
+
+            return Ok("Reset link sent to your email.");
+        }
+
+        [HttpPut("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(string token, string newPassword)
+        {
+            var userToChangePass = await _userService.GetUserByToken(token);
+
+            if (userToChangePass == null)
+            {
+                return NotFound($"User with this token was not found!");
+            }
+
+            var userWithNewPassword = await _userService.ResetPassword(userToChangePass, newPassword);
+
+            return Ok("Password successfully reset.");
+        }
+
+        [HttpPut("ConfirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string token, string newStatus)
+        {
+            var userToChangeStatus = await _userService.GetUserByToken(token);
+
+            if (userToChangeStatus == null)
+            {
+                return NotFound($"User with this token was not found!");
+            }
+
+            var userWithNewPassword = await _userService.ChangeStatus(userToChangeStatus, newStatus);
+
+            if (userWithNewPassword == null)
+            {
+                return NotFound($"Invalid status for user!");
+            }
+
+            return Ok("E-mail successfully confirmed.");
         }
     }
 }

@@ -1,11 +1,15 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using StoreManagmentSystem.Data.Entities;
+using StoreManagmentSystem.Data.Models;
+using StoreManagmentSystem.Help;
+using StoreManagmentSystem.Helpers;
 using StoreManagmentSystem.Repository;
-using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StoreManagmentSystem.Service
 {
@@ -17,7 +21,7 @@ namespace StoreManagmentSystem.Service
             _userRepository = userRepository;
         }
 
-        public async Task<User> AddUser(User user)
+        public async Task<UserModelWithPass> AddUser(UserModelWithPass user)
         {
             user.Password = HashPassword(user.Password);
             await _userRepository.AddUser(user);
@@ -51,7 +55,17 @@ namespace StoreManagmentSystem.Service
             return await _userRepository.GetUserByEmail(Email);
         }
 
-        public async Task<User> UpdateUser(Guid UserId, User newUserInfo)
+        public async Task<User> GetUserByToken(string Token)
+        {
+            return await _userRepository.GetUserByToken(Token);
+        }
+
+        public async Task<UserModelWithRole> GetModelById(Guid UserId)
+        {
+            return await _userRepository.GetModelById(UserId);
+        }
+
+        public async Task<UserModelWithRole> UpdateUser(Guid UserId, UserModelToChange newUserInfo)
         {
             var user = await _userRepository.GetUserById(UserId);
 
@@ -63,13 +77,13 @@ namespace StoreManagmentSystem.Service
             user.UserName = newUserInfo.UserName;
             user.FirstName = newUserInfo.FirstName;
             user.LastName = newUserInfo.LastName;
-            user.RoleId = newUserInfo.RoleId;
             user.Email = newUserInfo.Email;
             user.PhoneNumber = newUserInfo.PhoneNumber;
             user.Note = newUserInfo.Note;
 
             await _userRepository.UpdateUser(user);
-            return user;
+            var userModel = await _userRepository.GetModelById(UserId);
+            return userModel;
         }
 
 
@@ -84,7 +98,7 @@ namespace StoreManagmentSystem.Service
         }
 
 
-        public string GetToken(User User, string password)
+        public string GetJWTToken(User User, string password)
         {
             bool isValid = VerifyPassword(password, User.Password);
 
@@ -96,12 +110,14 @@ namespace StoreManagmentSystem.Service
             var secret = Environment.GetEnvironmentVariable("JWT");
             var key = Encoding.ASCII.GetBytes(secret);
 
+            var roleName = ((UserRole)User.RoleId).ToString();
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, User.UserName),
-                    new Claim(ClaimTypes.Role, User.RoleId.ToString())
+                    new Claim(ClaimTypes.Role, roleName)
                 }),
 
                 Expires = DateTime.UtcNow.AddMinutes(5),
@@ -131,5 +147,90 @@ namespace StoreManagmentSystem.Service
             await _userRepository.UpdateUser(userToUpdate);
             return userToUpdate;
         }
+
+        public async Task<User> UpdateUserRole(Guid UserId, string newRole)
+        {
+            var user = await _userRepository.GetUserById(UserId);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            if (!Enum.TryParse<UserRole>(newRole, ignoreCase: true, out var role))
+            {
+                return null;
+            }
+            user.RoleId = (int)role;
+
+            await _userRepository.UpdateUser(user);
+            return user;
+        }
+
+        public async Task<string> RequestPasswordReset(string email)
+        {
+            var user = await _userRepository.GetUserByEmail(email);
+            if (user == null)
+                return null;
+
+            string token = TokenGenerator.GenerateToken();
+            user.ActionToken = token;
+            await _userRepository.UpdateUser(user);
+
+            var resetLink = $"https://myfrontend.com/reset-password:email={email}&token={token}";
+
+            await EmailSender.SendEmail(
+                email,
+                "Reset Password",
+                $"Click here to reset your password:\n{resetLink}"
+            );
+
+            return resetLink;
+        }
+
+        public async Task<string> RequestEmailConfirm(string email)
+        {
+            var user = await _userRepository.GetUserByEmail(email);
+            if (user == null)
+                return null;
+
+            string token = TokenGenerator.GenerateToken();
+            user.ActionToken = token;
+            await _userRepository.UpdateUser(user);
+
+            var resetLink = $"https://myfrontend.com/confirm-email:email={email}&token={token}";
+
+            await EmailSender.SendEmail(
+                email,
+                "Confirm e-mail",
+                $"Click here to confirm your e-mail:\n{resetLink}"
+            );
+
+            return resetLink;
+        }
+        public async Task<User> ResetPassword(User user, string newPassword)
+        {
+            user.Password = HashPassword(newPassword);
+            user.ActionToken = "";
+
+            await _userRepository.UpdateUser(user);
+            return user;
+        }
+
+        public async Task<User> ChangeStatus(User user, string newStatus)
+        {
+
+            if (!Enum.TryParse<UserStatus>(newStatus, ignoreCase: true, out var status))
+            {
+                return null;
+            }
+
+            user.StatusId = (int)status;
+            user.ActionToken = "";
+
+            await _userRepository.UpdateUser(user);
+            return user;
+        }
+
     }
 }
