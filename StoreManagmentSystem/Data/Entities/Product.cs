@@ -4,13 +4,13 @@
     {
         public Guid ProductId { get; set; }
 
-        public string ProductName { get; set; }
+        public string Name { get; set; }
 
         public int TypeId { get; set; }
 
         public decimal Price { get; set; }
 
-        public double Quantity { get; set; }
+        public decimal Quantity { get; set; }
 
         public DateTime DateAdded { get; set; }
         public DateTime ExpirationDate { get; set; }

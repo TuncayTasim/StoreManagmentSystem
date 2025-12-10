@@ -15,4 +15,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Scripts\Seed\" />
+    <Folder Include="Data\Scripts\Tables\" />
+  </ItemGroup>
+
 </Project>

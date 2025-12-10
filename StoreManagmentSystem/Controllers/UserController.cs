@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StoreManagmentSystem.Data.Entities;
-using StoreManagmentSystem.Data.Models;
+using StoreManagmentSystem.Models;
 using StoreManagmentSystem.Service;
 
 namespace StoreManagmentSystem.Controllers
@@ -17,20 +17,20 @@ namespace StoreManagmentSystem.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("GetAllUsers")]
+        [HttpGet]
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             return await _userService.GetAllUsers();
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("GetUserById/{UserId}")]
+        [HttpGet("{UserId}")]
         public async Task<ActionResult<UserModelWithRole>> GetUserById(Guid UserId)
         {
             return await _userService.GetModelById(UserId);
         }
 
-        [HttpPost("AddUser")]
+        [HttpPost]
         public async Task<ActionResult> AddUser(UserModelWithPass user)
         {
             await _userService.AddUser(user);
@@ -40,7 +40,7 @@ namespace StoreManagmentSystem.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("DeleteUser/{UserId}")]
+        [HttpDelete("{UserId}")]
         public async Task<ActionResult> DeleteUser(Guid UserId)
         {
             var userToDelate = await _userService.DeleteUser(UserId);
@@ -54,7 +54,7 @@ namespace StoreManagmentSystem.Controllers
 
 
         [Authorize(Roles = "Admin,Salesman")]
-        [HttpPut("UpdateUser/{UserId}")]
+        [HttpPut("{UserId}")]
         public async Task<ActionResult> UpdateUser(Guid UserId, UserModelToChange newUserInfo)
         {
             var updatedUser = await _userService.UpdateUser(UserId, newUserInfo);

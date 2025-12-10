@@ -1,6 +1,6 @@
-﻿namespace StoreManagmentSystem.Data.Models
+﻿namespace StoreManagmentSystem.Models
 {
-    public class UserModelWithRole
+    public class UserModelWithPass
     {
         public string UserName { get; set; }
 
@@ -15,5 +15,7 @@
         public string PhoneNumber { get; set; }
 
         public string Note { get; set; }
+
+        public string Password { get; set; }
     }
 }

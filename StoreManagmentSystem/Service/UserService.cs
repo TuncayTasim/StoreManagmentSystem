@@ -1,8 +1,8 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using StoreManagmentSystem.Data.Entities;
-using StoreManagmentSystem.Data.Models;
 using StoreManagmentSystem.Help;
 using StoreManagmentSystem.Helpers;
+using StoreManagmentSystem.Models;
 using StoreManagmentSystem.Repository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
