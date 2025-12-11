@@ -15,7 +15,7 @@
         public DateTime DateAdded { get; set; }
         public DateTime ExpirationDate { get; set; }
 
-        public string QRCode { get; set; }
+        public string Barcode { get; set; }
 
         public string Note { get; set; }
     }

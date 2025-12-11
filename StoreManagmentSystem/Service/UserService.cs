@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.IdentityModel.Tokens;
 using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Help;
 using StoreManagmentSystem.Helpers;
@@ -173,7 +174,7 @@ namespace StoreManagmentSystem.Service
             if (user == null)
                 return null;
 
-            string token = TokenGenerator.GenerateToken();
+            string token = TokenGenerator.GenerateResetToken();
             user.ActionToken = token;
             await _userRepository.UpdateUser(user);
 
@@ -194,19 +195,19 @@ namespace StoreManagmentSystem.Service
             if (user == null)
                 return null;
 
-            string token = TokenGenerator.GenerateToken();
+            string token = TokenGenerator.GenerateConfirmToken();
             user.ActionToken = token;
             await _userRepository.UpdateUser(user);
 
-            var resetLink = $"https://myfrontend.com/confirm-email:email={email}&token={token}";
+            //var resetLink = $"https://myfrontend.com/confirm-email:email={email}&token={token}";
 
             await EmailSender.SendEmail(
                 email,
                 "Confirm e-mail",
-                $"Click here to confirm your e-mail:\n{resetLink}"
+                $"Thats your confirmation code:\n{token}"
             );
 
-            return resetLink;
+            return "Done";
         }
         public async Task<User> ResetPassword(User user, string newPassword)
         {

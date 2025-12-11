@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StoreManagmentSystem.Data;
 using StoreManagmentSystem.Data.Entities;
+using StoreManagmentSystem.Helpers;
 
 public class ProductRepository:IProductRepository
 {
@@ -21,9 +22,27 @@ public class ProductRepository:IProductRepository
         return await _context.Products.FindAsync(ProductId);
     }
 
+    public async Task<Product> GetProductByBarcode(string barcode)
+    {
+        return await _context.Products.FirstOrDefaultAsync(p => p.Barcode == barcode);
+    }
+
     public async Task AddProduct(Product product)
     {
-        await _context.Products.AddAsync(product);
+        var newProduct = new Product
+        {
+            Name = product.Name,
+            TypeId = product.TypeId,
+            Price = product.Price,
+            Quantity = product.Quantity,
+            DateAdded = product.DateAdded,
+            ExpirationDate = product.ExpirationDate,
+            Barcode = TokenGenerator.GenerateBulgarianEan13(),
+            Note = product.Note,
+        };
+
+
+        await _context.Products.AddAsync(newProduct);
         await _context.SaveChangesAsync();
     }
 
