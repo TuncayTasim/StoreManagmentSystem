@@ -28,6 +28,12 @@ namespace StoreManagmentSystem.Controllers
             return await _productService.GetProductById(ProductId);
         }
 
+        [HttpGet("Barcode/{barcode}")]
+        public async Task<ActionResult<Product>> GetProductByBarcode(string barcode)
+        {
+            return await _productService.GetProductByBarcode(barcode);
+        }
+
         [HttpPost]
         public async Task<ActionResult> AddProduct(Product product)
         {

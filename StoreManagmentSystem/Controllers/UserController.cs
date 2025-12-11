@@ -145,7 +145,7 @@ namespace StoreManagmentSystem.Controllers
         }
 
         [HttpPut("ConfirmEmail")]
-        public async Task<IActionResult> ConfirmEmail(string token, string newStatus)
+        public async Task<IActionResult> ConfirmEmail(string token)
         {
             var userToChangeStatus = await _userService.GetUserByToken(token);
 
@@ -154,7 +154,7 @@ namespace StoreManagmentSystem.Controllers
                 return NotFound($"User with this token was not found!");
             }
 
-            var userWithNewPassword = await _userService.ChangeStatus(userToChangeStatus, newStatus);
+            var userWithNewPassword = await _userService.ChangeStatus(userToChangeStatus, "Active");
 
             if (userWithNewPassword == null)
             {

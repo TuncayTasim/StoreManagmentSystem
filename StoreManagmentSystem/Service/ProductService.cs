@@ -19,6 +19,11 @@ public class ProductService:IProductService
         return await _productRepository.GetProductById(ProductId);
     }
 
+    public async Task<Product> GetProductByBarcode(string barcode)
+    {
+        return await _productRepository.GetProductByBarcode(barcode);
+    }
+
     public async Task AddProduct(Product product)
     {
         await _productRepository.AddProduct(product);
@@ -39,7 +44,7 @@ public class ProductService:IProductService
         product.Quantity = newProduct.Quantity;
         product.DateAdded = newProduct.DateAdded;
         product.ExpirationDate = newProduct.ExpirationDate;
-        product.QRCode = newProduct.QRCode;
+        product.Barcode = newProduct.Barcode;
         product.Note = newProduct.Note;
 
         await _productRepository.UpdateProduct(product);
