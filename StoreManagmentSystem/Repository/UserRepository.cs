@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using StoreManagmentSystem.Data;
 using StoreManagmentSystem.Data.Entities;
-using StoreManagmentSystem.Models;
+using StoreManagmentSystem.Models.UserModels;
 
 namespace StoreManagmentSystem.Repository
 {

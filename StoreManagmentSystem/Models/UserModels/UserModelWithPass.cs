@@ -1,4 +1,4 @@
-﻿namespace StoreManagmentSystem.Models
+﻿namespace StoreManagmentSystem.Models.UserModels
 {
     public class UserModelWithPass
     {

@@ -2,6 +2,7 @@
 using StoreManagmentSystem.Data;
 using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Helpers;
+using StoreManagmentSystem.Models.ProductModels;
 
 public class ProductRepository:IProductRepository
 {
@@ -14,7 +15,19 @@ public class ProductRepository:IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllProducts()
     {
-        return await _context.Products.AsNoTracking().ToListAsync();
+        return await _context.Products
+       .AsNoTracking()
+       .Select(u => new Product
+       {
+            ProductId = u.ProductId,
+            Name = u.Name,
+            TypeId = u.TypeId,
+            BrandId = u.BrandId,
+            Barcode = u.Barcode,
+            Note = u.Note,
+
+       })
+       .ToListAsync();
     }
 
     public async Task<Product> GetProductById(Guid ProductId)
@@ -27,18 +40,14 @@ public class ProductRepository:IProductRepository
         return await _context.Products.FirstOrDefaultAsync(p => p.Barcode == barcode);
     }
 
-    public async Task AddProduct(Product product)
+    public async Task AddProduct(ProductModel product)
     {
         var newProduct = new Product
         {
             Name = product.Name,
             TypeId = product.TypeId,
-            Price = product.Price,
-            Quantity = product.Quantity,
-            DateAdded = product.DateAdded,
-            ExpirationDate = product.ExpirationDate,
-            Barcode = TokenGenerator.GenerateBulgarianEan13(),
-            Note = product.Note,
+            BrandId = product.BrandId,
+            Note = product.Note
         };
 
 

@@ -20,12 +20,15 @@ PRINT '--- EXECUTING TABLE SCRIPTS ---';
 :r .\Tables\Roles.sql
 :r .\Tables\Statuses.sql
 :r .\Tables\Types.sql
+:r .\Tables\Brands.sql
 :r .\Tables\Users.sql
 :r .\Tables\Products.sql
 
 PRINT '--- EXECUTING SEED SCRIPTS ---';
 
 :r .\Seed\InsertRoles.sql
-:r .\Seed\InsertTypes.sql
+:r .\Seed\InsertStatuses.sql
+:r .\Seed\InsertProductTypes.sql
+:r .\Seed\InsertBrands.sql
 
 PRINT '--- INSTALLATION COMPLETED SUCCESSFULLY ---';

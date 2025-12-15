@@ -1,4 +1,6 @@
-﻿namespace StoreManagmentSystem.Data.Entities
+﻿using StoreManagmentSystem.Helpers;
+
+namespace StoreManagmentSystem.Data.Entities
 {
     public class Product
     {
@@ -8,14 +10,9 @@
 
         public int TypeId { get; set; }
 
-        public decimal Price { get; set; }
+        public int BrandId { get; set; }
 
-        public decimal Quantity { get; set; }
-
-        public DateTime DateAdded { get; set; }
-        public DateTime ExpirationDate { get; set; }
-
-        public string Barcode { get; set; }
+        public string Barcode { get; set; } = TokenGenerator.GenerateBulgarianEan13();
 
         public string Note { get; set; }
     }

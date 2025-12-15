@@ -1,14 +1,12 @@
-﻿namespace StoreManagmentSystem.Models
+﻿namespace StoreManagmentSystem.Models.UserModels
 {
-    public class UserModelWithRole
+    public class UserModelToChange
     {
         public string UserName { get; set; }
 
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
-
-        public int RoleId { get; set; }
 
         public string Email { get; set; }
 

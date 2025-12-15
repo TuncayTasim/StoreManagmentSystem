@@ -1,4 +1,4 @@
-﻿namespace StoreManagmentSystem
+﻿namespace StoreManagmentSystem.Enums
 {
     public enum UserRole
     {

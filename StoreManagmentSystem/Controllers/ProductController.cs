@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Models;
+using StoreManagmentSystem.Models.ProductModels;
 using StoreManagmentSystem.Service;
 
 namespace StoreManagmentSystem.Controllers
@@ -35,14 +36,14 @@ namespace StoreManagmentSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddProduct(Product product)
+        public async Task<ActionResult> AddProduct(ProductModel product)
         {
             await _productService.AddProduct(product);
             return Ok("Product successfully added.");
         }
 
         [HttpPut("{ProductId}")]
-        public async Task<ActionResult> UpdateProduct(Guid ProductId, Product newProductInfo)
+        public async Task<ActionResult> UpdateProduct(Guid ProductId, ProductModel newProductInfo)
         {
            var updatedProduct = await _productService.UpdateProduct(ProductId, newProductInfo);
 
