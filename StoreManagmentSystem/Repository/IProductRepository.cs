@@ -1,8 +1,9 @@
 ﻿using StoreManagmentSystem.Data.Entities;
+using StoreManagmentSystem.Models.ProductModels;
 
 public interface IProductRepository
 {
-    Task AddProduct(Product product);
+    Task AddProduct(ProductModel product);
     Task DeleteProduct(Product product);
     Task<IEnumerable<Product>> GetAllProducts();
     Task<Product> GetProductByBarcode(string barcode);

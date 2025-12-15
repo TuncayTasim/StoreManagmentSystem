@@ -1,4 +1,5 @@
 ﻿using StoreManagmentSystem.Data.Entities;
+using StoreManagmentSystem.Models.ProductModels;
 
 public class ProductService:IProductService
 {
@@ -24,12 +25,12 @@ public class ProductService:IProductService
         return await _productRepository.GetProductByBarcode(barcode);
     }
 
-    public async Task AddProduct(Product product)
+    public async Task AddProduct(ProductModel product)
     {
         await _productRepository.AddProduct(product);
     }
 
-    public async Task<Product> UpdateProduct(Guid idToSearch, Product newProduct)
+    public async Task<Product> UpdateProduct(Guid idToSearch, ProductModel newProduct)
     {
         var product = await _productRepository.GetProductById(idToSearch);
 
@@ -40,11 +41,7 @@ public class ProductService:IProductService
 
         product.Name = newProduct.Name;
         product.TypeId = newProduct.TypeId;
-        product.Price = newProduct.Price;
-        product.Quantity = newProduct.Quantity;
-        product.DateAdded = newProduct.DateAdded;
-        product.ExpirationDate = newProduct.ExpirationDate;
-        product.Barcode = newProduct.Barcode;
+        product.BrandId = newProduct.BrandId;
         product.Note = newProduct.Note;
 
         await _productRepository.UpdateProduct(product);

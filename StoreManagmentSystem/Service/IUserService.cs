@@ -1,5 +1,5 @@
 ﻿using StoreManagmentSystem.Data.Entities;
-using StoreManagmentSystem.Models;
+using StoreManagmentSystem.Models.UserModels;
 
 namespace StoreManagmentSystem.Service
 {
