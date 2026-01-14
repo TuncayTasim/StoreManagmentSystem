@@ -3,6 +3,9 @@ using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Models;
 using StoreManagmentSystem.Models.ProductModels;
 using StoreManagmentSystem.Service;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 
 namespace StoreManagmentSystem.Controllers
 {
@@ -51,8 +54,11 @@ namespace StoreManagmentSystem.Controllers
             {
                 return NotFound($"Product with ID {ProductId} was not found.");
             }
-
-            return Ok($"Product with ID: {ProductId} successfully updated\n New product:\n{updatedProduct}");
+            return Ok(new
+            {
+                Message = $"Product with ID: {ProductId} successfully updated",
+                UpdatedProduct = updatedProduct
+            });
         }
 
         [HttpDelete("{ProductId}")]

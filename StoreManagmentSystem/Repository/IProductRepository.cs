@@ -8,5 +8,6 @@ public interface IProductRepository
     Task<IEnumerable<Product>> GetAllProducts();
     Task<Product> GetProductByBarcode(string barcode);
     Task<Product> GetProductById(Guid ProductId);
+    Task<ProductModel> GetProductModelById(Guid productId);
     Task UpdateProduct(Product product);
 }

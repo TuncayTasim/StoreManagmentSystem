@@ -21,7 +21,7 @@ BEGIN
         [ActionToken] [nvarchar](500) NULL,
         [StatusId] [int] NOT NULL,
         CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([UserId] ASC)
-    ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];
+    ) 
     
     ALTER TABLE [dbo].[Users] ADD CONSTRAINT [DF_Users_StatusId_1] DEFAULT ((1)) FOR [StatusId];
     

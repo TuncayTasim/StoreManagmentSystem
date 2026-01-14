@@ -23,6 +23,7 @@ PRINT '--- EXECUTING TABLE SCRIPTS ---';
 :r .\Tables\Brands.sql
 :r .\Tables\Users.sql
 :r .\Tables\Products.sql
+:r .\Tables\Stocks.sql
 
 PRINT '--- EXECUTING SEED SCRIPTS ---';
 

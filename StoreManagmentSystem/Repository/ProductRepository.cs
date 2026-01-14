@@ -3,6 +3,7 @@ using StoreManagmentSystem.Data;
 using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Helpers;
 using StoreManagmentSystem.Models.ProductModels;
+using StoreManagmentSystem.Models.StockModels;
 
 public class ProductRepository:IProductRepository
 {
@@ -65,5 +66,22 @@ public class ProductRepository:IProductRepository
     {
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<ProductModel> GetProductModelById(Guid productId)
+    {
+        var product = await _context.Products.FindAsync(productId);
+        return MapToModel(product);
+    }
+    public ProductModel MapToModel(Product product)
+    {
+        return new ProductModel
+        {
+            Name = product.Name,
+            TypeId = product.TypeId,
+            BrandId = product.BrandId,
+            Note = product.Note
+
+        };
     }
 }

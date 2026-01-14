@@ -11,14 +11,11 @@ BEGIN
         [ProductId] [uniqueidentifier] NOT NULL,
         [Name] [nvarchar](500) NOT NULL,
         [TypeId] [int] NOT NULL,
-        [Price] [decimal](10, 2) NOT NULL,
-        [Quantity] [decimal](10, 2) NOT NULL,
-        [DateAdded] [date] NOT NULL,
-        [ExpirationDate] [nchar](10) NOT NULL,
+        [BrandId] [int] NOT NULL,
         [QRCode] [nvarchar](500) NOT NULL,
         [Note] [ntext] NULL,
         CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED ([ProductId] ASC)
-    ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];
+    )
     PRINT ' -> Created table Products.';
 END
 ELSE PRINT ' -> Table Products already exists.';
