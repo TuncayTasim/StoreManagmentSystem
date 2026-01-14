@@ -30,7 +30,7 @@ public class ProductService:IProductService
         await _productRepository.AddProduct(product);
     }
 
-    public async Task<Product> UpdateProduct(Guid idToSearch, ProductModel newProduct)
+    public async Task<ProductModel> UpdateProduct(Guid idToSearch, ProductModel newProduct)
     {
         var product = await _productRepository.GetProductById(idToSearch);
 
@@ -45,7 +45,8 @@ public class ProductService:IProductService
         product.Note = newProduct.Note;
 
         await _productRepository.UpdateProduct(product);
-        return product;
+        var productModel = await _productRepository.GetProductModelById(idToSearch);
+        return productModel;
     }
 
     public async Task<Product> DeleteProduct(Guid ProductId)

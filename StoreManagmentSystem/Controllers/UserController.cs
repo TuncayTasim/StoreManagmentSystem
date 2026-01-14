@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Models.UserModels;
 using StoreManagmentSystem.Service;
+using System.Security.Claims;
 
 namespace StoreManagmentSystem.Controllers
 {
@@ -99,6 +100,28 @@ namespace StoreManagmentSystem.Controllers
         }
 
         [Authorize(Roles = "Admin,Salesman")]
+        [HttpPut("UpdateEmail")]
+        public async Task<ActionResult> UpdateUserEmail(string newEmail, string pass)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userToChangeEmail = await _userService.GetUserById(Guid.Parse(userId));
+
+            if (userToChangeEmail == null)
+            {
+                return NotFound($"User with this id was not found");
+            }
+            var newEmailUser = await _userService.UpdateUserEmail(userToChangeEmail, newEmail, pass);
+            if (newEmailUser == null)
+            {
+                return Unauthorized($"Тhe entered passoword is not correct");
+            }
+            await _userService.RequestEmailConfirm(newEmailUser.Email);
+            return Ok("Email successfully updated. Please confirm your new email.");
+            
+
+        }
+
+        [Authorize(Roles = "Admin,Salesman")]
         [HttpPut("UpdatePassword")]
         public async Task<ActionResult> UpdateUserPassword(string email, string currentPass, string newUserPassword)
         {
@@ -156,12 +179,13 @@ namespace StoreManagmentSystem.Controllers
 
             var userWithNewPassword = await _userService.ChangeStatus(userToChangeStatus, "Active");
 
-            if (userWithNewPassword == null)
-            {
-                return NotFound($"Invalid status for user!");
-            }
+            //if (userWithNewPassword == null)
+            //{
+            //    return NotFound($"Invalid status for user!"); Ще го видя после това
+            //}
 
             return Ok("E-mail successfully confirmed.");
         }
+
     }
 }

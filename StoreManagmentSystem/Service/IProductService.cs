@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Query.Internal;
-using StoreManagmentSystem.Data.Entities;
+﻿using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Models.ProductModels;
 
 public interface IProductService
@@ -9,5 +8,5 @@ public interface IProductService
     Task<IEnumerable<Product>> GetAllProducts();
     Task<Product> GetProductByBarcode(string barcode);
     Task<Product> GetProductById(Guid ProductId);
-    Task<Product> UpdateProduct(Guid idToSearch, ProductModel newProduct);
+    Task<ProductModel> UpdateProduct(Guid idToSearch, ProductModel newProduct);
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using StoreManagmentSystem.Data.Entities;
 using StoreManagmentSystem.Enums;
@@ -79,7 +80,6 @@ namespace StoreManagmentSystem.Service
             user.UserName = newUserInfo.UserName;
             user.FirstName = newUserInfo.FirstName;
             user.LastName = newUserInfo.LastName;
-            user.Email = newUserInfo.Email;
             user.PhoneNumber = newUserInfo.PhoneNumber;
             user.Note = newUserInfo.Note;
 
@@ -119,7 +119,9 @@ namespace StoreManagmentSystem.Service
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, User.UserName),
-                    new Claim(ClaimTypes.Role, roleName)
+                    new Claim(ClaimTypes.Role, roleName),
+
+                    new Claim(ClaimTypes.NameIdentifier, User.UserId.ToString())
                 }),
 
                 Expires = DateTime.UtcNow.AddMinutes(5),
@@ -148,6 +150,21 @@ namespace StoreManagmentSystem.Service
 
             await _userRepository.UpdateUser(userToUpdate);
             return userToUpdate;
+        }
+        public async Task<User> UpdateUserEmail(User userToChangeEmail, string NewEmail, string Pass)
+        {
+
+            bool isValid = VerifyPassword(Pass, userToChangeEmail.Password);
+
+            if (!isValid)
+            {
+                return null;
+            }
+
+            userToChangeEmail.Email = NewEmail;
+
+            await _userRepository.UpdateUser(userToChangeEmail);
+            return userToChangeEmail;
         }
 
         public async Task<User> UpdateUserRole(Guid UserId, string newRole)

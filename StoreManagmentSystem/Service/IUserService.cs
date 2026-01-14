@@ -27,5 +27,6 @@ namespace StoreManagmentSystem.Service
         string HashPassword(string password);
         Task<string> RequestEmailConfirm(string email);
         Task<User> ChangeStatus(User user, string newStatus);
+        Task<User> UpdateUserEmail(User userToChangeEmail, string NewEmail, string Pass);
     }
 }

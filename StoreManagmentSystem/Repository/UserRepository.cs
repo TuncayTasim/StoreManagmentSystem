@@ -88,7 +88,7 @@ namespace StoreManagmentSystem.Repository
             await _context.SaveChangesAsync();
         }
 
-         public UserModelWithRole MapToModel(User entity)
+        public UserModelWithRole MapToModel(User entity)
         {
             return new UserModelWithRole
             {
