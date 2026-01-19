@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <Folder Include="Data\Scripts\Seed\" />
-    <Folder Include="Data\Scripts\Tables\" />
   </ItemGroup>
 
 </Project>

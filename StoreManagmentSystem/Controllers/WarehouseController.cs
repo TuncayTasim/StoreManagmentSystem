@@ -10,35 +10,35 @@ namespace StoreManagmentSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StockController : ControllerBase
+    public class WarehouseController : ControllerBase
     {
-        private readonly IStockService _stockService;
-        public StockController(IStockService inventoryService)
+        private readonly IWarehouseService _stockService;
+        public WarehouseController(IWarehouseService inventoryService)
         {
             _stockService = inventoryService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Stock>> GetAllStocksInInventory()
+        public async Task<IEnumerable<WarehouseRestock>> GetAllStocksInInventory()
         {
             return await _stockService.GetAllStocksInInventory();
         }
 
         [HttpGet("{StockId}")]
-        public async Task<ActionResult<Stock>> GetStockById(int StockId)
+        public async Task<ActionResult<WarehouseRestock>> GetStockById(int StockId)
         {
             return await _stockService.GetStockById(StockId);
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddStock(StockModel stock)
+        public async Task<ActionResult> AddStock(WarehouseModel stock)
         {
             await _stockService.AddStock(stock);
             return Ok();
         }
 
         [HttpPut("{StockId}")]
-        public async Task<ActionResult> UpdateStock(int StockId, StockModelNoId stock)
+        public async Task<ActionResult> UpdateStock(int StockId, WarehouseModelNoId stock)
         {
             var updatedStock = await _stockService.UpdateStock(StockId, stock);
 
@@ -63,6 +63,17 @@ namespace StoreManagmentSystem.Controllers
                 return NotFound($"Stock with ID {StockId} was not found.");
             }
             return Ok($"Stock with ID: {StockId} successfully deleted");
+        }
+
+        [HttpGet("StockCount/{ProductId}")]
+        public async Task<ActionResult> CheckStockCount(Guid ProductId)
+        { 
+            decimal stockCount = await _stockService.GetStockCount(ProductId);
+            if (stockCount == -1)
+            {
+                NotFound("There is no product with this Id in stock!");
+            }
+            return Ok("The quantity of this product in stock is: " + stockCount);
         }
     }
 }

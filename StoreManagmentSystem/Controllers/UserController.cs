@@ -179,11 +179,6 @@ namespace StoreManagmentSystem.Controllers
 
             var userWithNewPassword = await _userService.ChangeStatus(userToChangeStatus, "Active");
 
-            //if (userWithNewPassword == null)
-            //{
-            //    return NotFound($"Invalid status for user!"); Ще го видя после това
-            //}
-
             return Ok("E-mail successfully confirmed.");
         }
 
