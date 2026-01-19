@@ -7,20 +7,20 @@ using StoreManagmentSystem.Models.UserModels;
 
 namespace StoreManagmentSystem.Repository
 {
-    public class StockRepository:IStockRepository
+    public class WarehouseRepository:IWarehouseRepository
     {
         private readonly AppDbContext _context;
-        public StockRepository(AppDbContext context)
+        public WarehouseRepository(AppDbContext context)
         {
             _context = context;
         }
-        public async Task<IEnumerable<Stock>> GetAllStocksInInventory()
+        public async Task<IEnumerable<WarehouseRestock>> GetAllStocksInInventory()
         {
-            return await _context.Stocks
+            return await _context.WarehouseRestocks
            .AsNoTracking()
-           .Select(u => new Stock
+           .Select(u => new WarehouseRestock
            {
-               StockId = u.StockId,
+               WarehouseId = u.WarehouseId,
                ProductId = u.ProductId,
                PriceBought = u.PriceBought,
                QuantityRestocked = u.QuantityRestocked,
@@ -29,42 +29,42 @@ namespace StoreManagmentSystem.Repository
            })
            .ToListAsync();
         }
-        public async Task<Stock> GetStockById(int StockId)
+        public async Task<WarehouseRestock> GetStockById(int StockId)
         {
-            return await _context.Stocks.FindAsync(StockId);
+            return await _context.WarehouseRestocks.FindAsync(StockId);
         }
-        public async Task AddStock(StockModel stock)
+        public async Task AddStock(WarehouseModel stock)
         {
-            var newStock = new Stock
+            var newStock = new WarehouseRestock
             {
                 ProductId = stock.ProductId,
                 PriceBought = stock.PriceBought,
                 QuantityRestocked = stock.QuantityRestocked,
                 DaysToExpire = stock.DaysToExpire
             };
-            await _context.Stocks.AddAsync(newStock);
+            await _context.WarehouseRestocks.AddAsync(newStock);
             await _context.SaveChangesAsync();
         }
-        public async Task UpdateStock(Stock stock)
+        public async Task UpdateStock(WarehouseRestock stock)
         {
-            _context.Stocks.Update(stock);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteStock(Stock stock)
-        {
-            _context.Stocks.Remove(stock);
+            _context.WarehouseRestocks.Update(stock);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<StockModel> GetStockModelById(int stockId)
+        public async Task DeleteStock(WarehouseRestock stock)
         {
-            var stock = await _context.Stocks.FindAsync(stockId);
+            _context.WarehouseRestocks.Remove(stock);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<WarehouseModel> GetStockModelById(int stockId)
+        {
+            var stock = await _context.WarehouseRestocks.FindAsync(stockId);
             return MapToModel(stock);
         }
-        public StockModel MapToModel(Stock stock)
+        public WarehouseModel MapToModel(WarehouseRestock stock)
         {
-            return new StockModel
+            return new WarehouseModel
             {
                 ProductId=stock.ProductId,
                 PriceBought=stock.PriceBought,
@@ -72,6 +72,14 @@ namespace StoreManagmentSystem.Repository
                 DaysToExpire = stock.DaysToExpire
 
             };
+        }
+
+        public async Task<List<WarehouseRestock>> GetStockCount(Guid productId)
+        {
+            var stock = await _context.WarehouseRestocks
+                .Where(s => s.ProductId == productId)
+                .ToListAsync();
+            return stock;
         }
     }
 }

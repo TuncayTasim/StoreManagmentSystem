@@ -15,5 +15,11 @@ namespace StoreManagmentSystem.Data.Entities
         public string Barcode { get; set; } = TokenGenerator.GenerateBulgarianEan13();
 
         public string Note { get; set; }
+
+        public decimal QuantityInWarehouse { get; set; }
+
+        public decimal QuantityInShelf { get; set; }
+
+        
     }
 }
