@@ -1,4 +1,4 @@
-﻿namespace StoreManagmentSystem.Models.StockModels
+﻿namespace StoreManagmentSystem.Models.WarehouseModels
 {
     public class WarehouseModel
     {

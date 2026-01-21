@@ -32,7 +32,7 @@ namespace StoreManagmentSystem.Controllers
             return await _productService.GetProductById(ProductId);
         }
 
-        [HttpGet("Barcode/{barcode}")]
+        [HttpGet("ProductByBarcode/{barcode}")]
         public async Task<ActionResult<Product>> GetProductByBarcode(string barcode)
         {
             return await _productService.GetProductByBarcode(barcode);

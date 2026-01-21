@@ -1,7 +1,5 @@
 ﻿using StoreManagmentSystem.Data.Entities;
-using StoreManagmentSystem.Enums;
-using StoreManagmentSystem.Models.StockModels;
-using StoreManagmentSystem.Models.UserModels;
+using StoreManagmentSystem.Models.WarehouseModels;
 using StoreManagmentSystem.Repository;
 
 namespace StoreManagmentSystem.Service
@@ -9,9 +7,11 @@ namespace StoreManagmentSystem.Service
     public class WarehouseService:IWarehouseService
     {
         private readonly IWarehouseRepository _warehouseRepository;
-        public WarehouseService(IWarehouseRepository inventoryRepository)
+        private readonly IProductRepository _productRepository;
+        public WarehouseService(IWarehouseRepository inventoryRepository, IProductRepository productRepository)
         {
             _warehouseRepository = inventoryRepository;
+            _productRepository = productRepository;
         }
         public async Task<IEnumerable<WarehouseRestock>> GetAllStocksInInventory()
         {
@@ -23,7 +23,12 @@ namespace StoreManagmentSystem.Service
         }
         public async Task AddStock(WarehouseModel stock)
         {
-           await _warehouseRepository.AddStock(stock);
+            var product = await _productRepository.GetProductById(stock.ProductId);
+            if (product != null)
+            {
+                product.QuantityInWarehouse += stock.QuantityRestocked;
+            }
+            await _warehouseRepository.AddStock(stock);
 
         }
         public async Task<WarehouseModel> UpdateStock(int ProductId, WarehouseModelNoId stock)
@@ -42,26 +47,35 @@ namespace StoreManagmentSystem.Service
             return stockModel;
         }
         
-        public async Task<WarehouseRestock> DeleteStock(int StockId)
+        public async Task<WarehouseDeleteResult> DeleteStock(int StockId)
         {
             var existingStock = await _warehouseRepository.GetStockById(StockId);
             if (existingStock == null)
             {
-                return null;
+                return new WarehouseDeleteResult
+                {
+                    Success = false,
+                    Message = "Product for this stock entry was not found."
+                };
             }
-            _warehouseRepository.DeleteStock(existingStock);
-            return existingStock;
-        }
-        public async Task<decimal> GetStockCount(Guid productId)
-        {
-            var stockList = await _warehouseRepository.GetStockCount(productId);
-            if (stockList == null || !stockList.Any())
+            var product = await _productRepository.GetProductById(existingStock.ProductId);
+            if (product.QuantityInWarehouse < existingStock.QuantityRestocked)
             {
-                return -1;
+                return new WarehouseDeleteResult
+                {
+                    Success = false,
+                    Message = "Operation is impossible to be done because of lack of availability."
+                };
             }
-            decimal totalQuantity = stockList.Sum(s => s.QuantityRestocked);
-            return totalQuantity;
 
+            product.QuantityInWarehouse -= existingStock.QuantityRestocked;
+            return await _warehouseRepository.DeleteStock(existingStock);
+        }
+
+        public async Task<IEnumerable<WarehouseRestock>> GetAllStocksByProductId(Guid ProductId)
+        {
+            var allStocks = await _warehouseRepository.GetAllStocksByProductId(ProductId);
+            return allStocks;
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StoreManagmentSystem.Data;
 using StoreManagmentSystem.Data.Entities;
-using StoreManagmentSystem.Helpers;
 using StoreManagmentSystem.Models.ProductModels;
-using StoreManagmentSystem.Models.StockModels;
 
 public class ProductRepository:IProductRepository
 {
@@ -26,6 +24,8 @@ public class ProductRepository:IProductRepository
             BrandId = u.BrandId,
             Barcode = u.Barcode,
             Note = u.Note,
+            QuantityInWarehouse = u.QuantityInWarehouse,
+            QuantityInShelf = u.QuantityInShelf
 
        })
        .ToListAsync();
@@ -48,7 +48,9 @@ public class ProductRepository:IProductRepository
             Name = product.Name,
             TypeId = product.TypeId,
             BrandId = product.BrandId,
-            Note = product.Note
+            Note = product.Note,
+            QuantityInWarehouse = 0,
+            QuantityInShelf = 0
         };
 
 
