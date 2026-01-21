@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using StoreManagmentSystem.Data.Entities;
-using StoreManagmentSystem.Models.ProductModels;
-using StoreManagmentSystem.Models.StockModels;
+using StoreManagmentSystem.Models.WarehouseModels;
 using StoreManagmentSystem.Service;
-using System.Text.Json;
 
 namespace StoreManagmentSystem.Controllers
 {
@@ -12,35 +9,42 @@ namespace StoreManagmentSystem.Controllers
     [ApiController]
     public class WarehouseController : ControllerBase
     {
-        private readonly IWarehouseService _stockService;
+        private readonly IWarehouseService _warehouseService;
         public WarehouseController(IWarehouseService inventoryService)
         {
-            _stockService = inventoryService;
+            _warehouseService = inventoryService;
         }
 
         [HttpGet]
         public async Task<IEnumerable<WarehouseRestock>> GetAllStocksInInventory()
         {
-            return await _stockService.GetAllStocksInInventory();
+            return await _warehouseService.GetAllStocksInInventory();
         }
 
         [HttpGet("{StockId}")]
         public async Task<ActionResult<WarehouseRestock>> GetStockById(int StockId)
         {
-            return await _stockService.GetStockById(StockId);
+            return await _warehouseService.GetStockById(StockId);
+        }
+
+        [HttpGet("StocksByProduct/{ProductId}")]
+        public async Task<IEnumerable<WarehouseRestock>> GetAllStocksByProductId(Guid ProductId)
+        {
+            var allStocksByProductId = await _warehouseService.GetAllStocksByProductId(ProductId);
+            return allStocksByProductId;
         }
 
         [HttpPost]
         public async Task<ActionResult> AddStock(WarehouseModel stock)
         {
-            await _stockService.AddStock(stock);
+            await _warehouseService.AddStock(stock);
             return Ok();
         }
 
         [HttpPut("{StockId}")]
         public async Task<ActionResult> UpdateStock(int StockId, WarehouseModelNoId stock)
         {
-            var updatedStock = await _stockService.UpdateStock(StockId, stock);
+            var updatedStock = await _warehouseService.UpdateStock(StockId, stock);
 
             if (updatedStock == null)
             {
@@ -57,23 +61,24 @@ namespace StoreManagmentSystem.Controllers
 
         public async Task<ActionResult> DeleteStock(int StockId)
         {
-            var deletedStock = await _stockService.DeleteStock(StockId);
-            if (deletedStock == null)
+            var deleteResult = await _warehouseService.DeleteStock(StockId);
+            if (deleteResult == null)
             {
                 return NotFound($"Stock with ID {StockId} was not found.");
             }
-            return Ok($"Stock with ID: {StockId} successfully deleted");
-        }
 
-        [HttpGet("StockCount/{ProductId}")]
-        public async Task<ActionResult> CheckStockCount(Guid ProductId)
-        { 
-            decimal stockCount = await _stockService.GetStockCount(ProductId);
-            if (stockCount == -1)
+            if (!deleteResult.Success)
             {
-                NotFound("There is no product with this Id in stock!");
+                return BadRequest(deleteResult.Message);
             }
-            return Ok("The quantity of this product in stock is: " + stockCount);
+
+            return Ok(new
+            {
+                deleteResult.Message,
+                deleteResult.DeletedStock,
+                deleteResult.QuantityInWarehouse,
+                deleteResult.RestockRecommended
+            });
         }
     }
 }

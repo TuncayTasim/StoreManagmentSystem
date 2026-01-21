@@ -47,6 +47,9 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 
+builder.Services.AddScoped<IShelfRepository, ShelfRepository>();
+builder.Services.AddScoped<IShelfService, ShelfService>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

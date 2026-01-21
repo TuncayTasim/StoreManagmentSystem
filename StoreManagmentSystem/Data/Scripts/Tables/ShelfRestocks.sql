@@ -11,7 +11,7 @@ BEGIN
         [ShelfId] [int] NOT NULL identity,
         [ProductId] [uniqueidentifier] NOT NULL,
         [PriceSell] [decimal](10, 2) NOT NULL,
-        [QuantityInShelf] [decimal](10, 2) NOT NULL,
+        [QuantityRestocked] [decimal](10, 2) NOT NULL,
         [RestockDate] [date] NOT NULL,
 		CONSTRAINT [PK_ShelfRestocks] PRIMARY KEY CLUSTERED ([ShelfId] ASC)
     )
@@ -19,15 +19,12 @@ BEGIN
 END
 ELSE PRINT ' -> Table ShelfRestocks already exists.';
 
-IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_Products_Id')
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_ShelfRestocks_ProductId')
 BEGIN
-    ALTER TABLE [dbo].[ShelfRestocks] WITH CHECK ADD CONSTRAINT [FK_Products_Id] 
-    FOREIGN KEY([ProductId]) REFERENCES [dbo].[Products]([ProductId]);
+    ALTER TABLE [dbo].[ShelfRestocks] WITH CHECK ADD CONSTRAINT [FK_ShelfRestocks_ProductId]
+FOREIGN KEY([ProductId]) REFERENCES [dbo].[Products]([ProductId]);
     
-    ALTER TABLE [dbo].[ShelfRestocks] CHECK CONSTRAINT [FK_Products_Id];
-    PRINT ' -> Added FK_Products_Id.';
+    ALTER TABLE [dbo].[ShelfRestocks] CHECK CONSTRAINT [FK_ShelfRestocks_ProductId];
+    PRINT ' -> Added FK_ShelfRestocks_ProductId.';
 END
 GO
-
-
-

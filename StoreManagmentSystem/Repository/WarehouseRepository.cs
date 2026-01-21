@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using StoreManagmentSystem.Data;
 using StoreManagmentSystem.Data.Entities;
-using StoreManagmentSystem.Models.StockModels;
+using StoreManagmentSystem.Models.WarehouseModels;
 using StoreManagmentSystem.Models.UserModels;
 
 namespace StoreManagmentSystem.Repository
@@ -51,10 +51,23 @@ namespace StoreManagmentSystem.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteStock(WarehouseRestock stock)
+        public async Task<WarehouseDeleteResult> DeleteStock(WarehouseRestock stock)
         {
+            var product = await _context.Products.FindAsync(stock.ProductId);
+
             _context.WarehouseRestocks.Remove(stock);
             await _context.SaveChangesAsync();
+
+            return new WarehouseDeleteResult
+            {
+                Success = true,
+                DeletedStock = stock,
+                QuantityInWarehouse = product.QuantityInWarehouse,
+                RestockRecommended = product.QuantityInWarehouse <= 10,
+                Message = product.QuantityInWarehouse <= 10
+                    ? "Stock deleted. Quantity is 10 or below. Please restock."
+                    : "Stock deleted successfully."
+            };
         }
 
         public async Task<WarehouseModel> GetStockModelById(int stockId)
@@ -74,12 +87,21 @@ namespace StoreManagmentSystem.Repository
             };
         }
 
-        public async Task<List<WarehouseRestock>> GetStockCount(Guid productId)
+        public async Task<IEnumerable<WarehouseRestock>> GetAllStocksByProductId(Guid ProductId)
         {
-            var stock = await _context.WarehouseRestocks
-                .Where(s => s.ProductId == productId)
-                .ToListAsync();
-            return stock;
+            return await _context.WarehouseRestocks
+           .AsNoTracking()
+           .Where(u => u.ProductId == ProductId)
+           .Select(u => new WarehouseRestock
+           {
+               WarehouseId = u.WarehouseId,
+               ProductId = u.ProductId,
+               PriceBought = u.PriceBought,
+               QuantityRestocked = u.QuantityRestocked,
+               DaysToExpire = u.DaysToExpire,
+               RestockDate = u.RestockDate
+           })
+           .ToListAsync();
         }
     }
 }
