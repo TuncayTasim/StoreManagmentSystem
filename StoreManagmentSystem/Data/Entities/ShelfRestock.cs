@@ -2,10 +2,8 @@
 {
     public class ShelfRestock
     {
-        public int ShelfId { get; set; }
-        public Guid ProductId { get; set; }
+        public int ItemId { get; set; }
         public decimal PriceSell { get; set; }
-        public decimal QuantityRestocked { get; set; }
-        public DateTime RestockDate { get; set; }
+        public int ShelfId { get; set; }
     }
 }

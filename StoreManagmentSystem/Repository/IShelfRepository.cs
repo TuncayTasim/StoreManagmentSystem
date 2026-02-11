@@ -1,17 +1,21 @@
 ﻿using StoreManagmentSystem.Data.Entities;
+using StoreManagmentSystem.Models.SaleModels;
 using StoreManagmentSystem.Models.ShelfModels;
 
 namespace StoreManagmentSystem.Repository
 {
     public interface IShelfRepository
     {
-        Task AddItem(ShelfModel item);
-        Task<ShelfDeleteResult> DeleteItem(ShelfRestock item);
-        Task<IEnumerable<ShelfRestock>> GetAllItemsByProductId(Guid ProductId);
-        Task<IEnumerable<ShelfRestock>> GetAllItemsOnShelf();
+        Task<IEnumerable<ShelfModel>> GetAllItemsByProductId(Guid ProductId);
+        Task<IEnumerable<Shelf>> GetAllItemsOnShelf();
+        Task<IEnumerable<ShelfRestock>> GetAllMoves();
         Task<ShelfRestock> GetItemById(int shelfId);
-        Task<ShelfModel> GetItemModelById(int shelfId);
-        ShelfModel MapToModel(ShelfRestock item);
-        Task UpdateItem(ShelfRestock item);
+        Task<ShelfRestock> GetItemEntityByModel(ShelfModel item);
+        Task<ShelfModel> GetItemModelById(int itemId);
+        Task<Shelf> GetMoveRecordById(int shelfId);
+        Task<Shelf> GetMoveRecordByModel(ShelfModel item);
+        ShelfModel MapToModel(ShelfRestock item, Shelf shelfRecord);
+        Task MoveToShelf(ShelfModel item);
+        Task UpdateItem(ShelfRestock item, Shelf shelfRecord);
     }
 }

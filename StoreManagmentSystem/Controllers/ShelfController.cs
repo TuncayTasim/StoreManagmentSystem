@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StoreManagmentSystem.Data.Entities;
+using StoreManagmentSystem.Models.SaleModels;
 using StoreManagmentSystem.Models.ShelfModels;
 using StoreManagmentSystem.Models.WarehouseModels;
 using StoreManagmentSystem.Service;
@@ -16,70 +17,85 @@ namespace StoreManagmentSystem.Controllers
         {
             _shelfService = shelfService;
         }
-
         [HttpGet]
-        public async Task<IEnumerable<ShelfRestock>> GetAllItemsOnShelf()
+        public async Task<IEnumerable<Shelf>> GetAllItemsOnShelf()
         {
             return await _shelfService.GetAllItemsOnShelf();
         }
-
+        [HttpGet("GetItem/{itemId}")]
+        public async Task<ActionResult<ShelfRestock>> GetItemById(int itemId)
+        {
+            return await _shelfService.GetItemById(itemId);
+        }
+        [HttpGet("AllRestockRecords")]
+        public async Task<IEnumerable<ShelfRestock>> GetAllMoves()
+        {
+            return await _shelfService.GetAllMoves();
+        }
         [HttpGet("{shelfId}")]
-        public async Task<ActionResult<ShelfRestock>> GetItemById(int shelfId)
+        public async Task<ActionResult<Shelf>> GetMoveRecordById(int shelfId)
         {
-            return await _shelfService.GetItemById(shelfId);
+            return await _shelfService.GetMoveRecordById(shelfId);
         }
-
-        [HttpPut]
-        public async Task<ActionResult> AddItem(ShelfModel item)
+        [HttpPost]
+        public async Task<ActionResult> MoveToShelf(ShelfModel item)
         {
-            await _shelfService.AddItem(item);
-            return Ok();
-        }
-
-        [HttpPost("{shelfId}")]
-        public async Task<ActionResult> UpdateItem(int shelfId, ShelfModelNoId item)
-        {
-            var updatedItem = await _shelfService.UpdateItem(shelfId, item);
-            if (updatedItem == null)
+            try
             {
-                NotFound($"Item with ID {shelfId} was not found.");
+                var addedItemInfo = await _shelfService.MoveToShelf(item);
+                return Ok(addedItemInfo);
             }
-            return Ok(new
+            catch (ArgumentOutOfRangeException ex)
             {
-                Message = $"Item with ProductId: {shelfId} successfully updated",
-                UpdatedStock = updatedItem
-            });
+                return BadRequest(ex.Message);
+            }
         }
-
-        [HttpDelete("{shelfId}")]
-        public async Task<ActionResult> DeleteItem(int shelfId)
+        [HttpPut("{itemId}")]
+        public async Task<ActionResult> UpdateItem(int itemId, ShelfModelNoId item)
         {
-            var deleteResult = await _shelfService.DeleteItem(shelfId);
-            if (deleteResult == null)
+            try
             {
-                return NotFound($"Item with ID {shelfId} was not found.");
+                var updatedItem = await _shelfService.UpdateItem(itemId, item);
+                if (updatedItem == null)
+                {
+                    return NotFound($"Item with ID {itemId} was not found.");
+                }
+                return Ok(updatedItem);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                return BadRequest(ex.Message);
             }
 
-            if (!deleteResult.Success)
-            {
-                return BadRequest(deleteResult.Message);
-            }
-
-            return Ok(new
-            {
-                deleteResult.Message,
-                deleteResult.DeletedItem,
-                deleteResult.QuantityInShelf,
-                deleteResult.RestockRecommended
-            });
         }
-
         [HttpGet("ItemsByProduct/{ProductId}")]
-        public async Task<IEnumerable<ShelfRestock>> GetAllItemsByProductId(Guid ProductId)
+        public async Task<IEnumerable<ShelfModel>> GetAllItemsByProductId(Guid ProductId)
         {
             var allStocksByProductId = await _shelfService.GetAllItemsByProductId(ProductId);
             return allStocksByProductId;
         }
 
+        //[HttpDelete("{shelfId}")]
+        //public async Task<ActionResult> DeleteItem(int shelfId)
+        //{
+        //    var deleteResult = await _shelfService.DeleteItem(shelfId);
+        //    if (deleteResult == null)
+        //    {
+        //        return NotFound($"Item with ID {shelfId} was not found.");
+        //    }
+
+        //    if (!deleteResult.Success)
+        //    {
+        //        return BadRequest(deleteResult.Message);
+        //    }
+
+        //    return Ok(new
+        //    {
+        //        deleteResult.Message,
+        //        deleteResult.DeletedItem,
+        //        deleteResult.QuantityInShelf,
+        //        deleteResult.RestockRecommended
+        //    });
+        //}
     }
 }

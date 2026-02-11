@@ -14,6 +14,8 @@ BEGIN
         [BrandId] [int] NOT NULL,
         [QRCode] [nvarchar](500) NOT NULL,
         [Note] [ntext] NULL,
+        [QuantityInWarehouse] [int] not null,
+        [QuantityInShelf] [int] not null,
         CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED ([ProductId] ASC)
     )
     PRINT ' -> Created table Products.';
@@ -27,6 +29,16 @@ BEGIN
     
     ALTER TABLE [dbo].[Products] CHECK CONSTRAINT [FK_Products_Types];
     PRINT ' -> Added FK_Products_Types.';
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_Products_Brands')
+BEGIN
+    ALTER TABLE [dbo].[Products] WITH CHECK ADD CONSTRAINT [FK_Products_Brands] 
+    FOREIGN KEY([BrandId]) REFERENCES [dbo].[Brands] ([BrandId]);
+    
+    ALTER TABLE [dbo].[Products] CHECK CONSTRAINT [FK_Products_Brands];
+    PRINT ' -> Added FK_Products_Brands.';
 END
 GO
 

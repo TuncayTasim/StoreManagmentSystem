@@ -16,69 +16,115 @@ namespace StoreManagmentSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<WarehouseRestock>> GetAllStocksInInventory()
+        public async Task<IEnumerable<WarehouseRestock>> GetAllRestocks()
         {
-            return await _warehouseService.GetAllStocksInInventory();
+            return await _warehouseService.GetAllRestocks();
         }
 
-        [HttpGet("{StockId}")]
-        public async Task<ActionResult<WarehouseRestock>> GetStockById(int StockId)
+        [HttpGet("GetRestock/{stockId}")]
+        public async Task<ActionResult<WarehouseRestock>> GetRestockById(int stockId)
         {
-            return await _warehouseService.GetStockById(StockId);
+            return await _warehouseService.GetRestockById(stockId);
         }
 
-        [HttpGet("StocksByProduct/{ProductId}")]
-        public async Task<IEnumerable<WarehouseRestock>> GetAllStocksByProductId(Guid ProductId)
+        [HttpGet("AllRestockRecords")]
+        public async Task<IEnumerable<Warehouse>> GetAllStocksInWarehouse()
         {
-            var allStocksByProductId = await _warehouseService.GetAllStocksByProductId(ProductId);
+            return await _warehouseService.GetAllStocksInWarehouse();
+        }
+
+        [HttpGet("{warehouseId}")]
+        public async Task<ActionResult<Warehouse>> GetRestockRecordById(int warehouseId)
+        {
+            return await _warehouseService.GetRestockRecordById(warehouseId);
+        }
+
+        [HttpGet("StocksByProduct/{productId}")]
+        public async Task<IEnumerable<WarehouseModel>> GetAllRestocksByProductId(Guid productId)
+        {
+            var allStocksByProductId = await _warehouseService.GetAllRestocksByProductId(productId);
             return allStocksByProductId;
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddStock(WarehouseModel stock)
+        public async Task<ActionResult> Restock(WarehouseModel stock)
         {
-            await _warehouseService.AddStock(stock);
-            return Ok();
-        }
-
-        [HttpPut("{StockId}")]
-        public async Task<ActionResult> UpdateStock(int StockId, WarehouseModelNoId stock)
-        {
-            var updatedStock = await _warehouseService.UpdateStock(StockId, stock);
-
-            if (updatedStock == null)
+            try
             {
-                return NotFound($"Stock with ID {StockId} was not found.");
+                await _warehouseService.Restock(stock);
+                return Ok();
             }
-            return Ok(new
+            catch (ArgumentOutOfRangeException ex)
             {
-                Message = $"Stock with ProductId: {StockId} successfully updated",
-                UpdatedStock = updatedStock
-            });
-        }
-
-        [HttpDelete("{StockId}")]
-
-        public async Task<ActionResult> DeleteStock(int StockId)
-        {
-            var deleteResult = await _warehouseService.DeleteStock(StockId);
-            if (deleteResult == null)
-            {
-                return NotFound($"Stock with ID {StockId} was not found.");
+                return BadRequest(ex.Message);
             }
 
-            if (!deleteResult.Success)
+        }
+
+        [HttpPut("{stockId}")]
+        public async Task<ActionResult> UpdateRestock(int stockId, WarehouseModelNoId stock)
+        {
+            try
             {
-                return BadRequest(deleteResult.Message);
+                var updatedStock = await _warehouseService.UpdateRestock(stockId, stock);
+
+                if (updatedStock == null)
+                {
+                    return NotFound($"Stock with ID {stockId} was not found.");
+                }
+                return Ok(new
+                {
+                    Message = $"Stock with ProductId: {stockId} successfully updated",
+                    UpdatedStock = updatedStock
+                });
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                return BadRequest(ex.Message);
             }
 
-            return Ok(new
-            {
-                deleteResult.Message,
-                deleteResult.DeletedStock,
-                deleteResult.QuantityInWarehouse,
-                deleteResult.RestockRecommended
-            });
         }
+
+
+        //next 2 methods will be tranformed to reject methods
+        //[HttpDelete("{stockId}")]
+        //public async Task<ActionResult> DeleteStock(int stockId)
+        //{
+        //    var deleteResult = await _warehouseService.DeleteStock(stockId);
+        //    if (deleteResult == null)
+        //    {
+        //        return NotFound($"Stock with ID {stockId} was not found.");
+        //    }
+
+        //    if (!deleteResult.Success)
+        //    {
+        //        return BadRequest(deleteResult.Message);
+        //    }
+
+        //    return Ok(new
+        //    {
+        //        deleteResult.Message,
+        //        deleteResult.DeletedStock,
+        //        deleteResult.QuantityInWarehouse,
+        //        deleteResult.RestockRecommended
+        //    });
+
+        //}
+
+        //[HttpDelete("RemoveExpiredStocks")]
+        //public async Task<ActionResult> RemoveExpiredStocks()
+        //{
+        //    var removedList = await _warehouseService.RemoveExpiredStocks();
+        //    if (removedList == null)
+        //    {
+        //        return NotFound("No expired stocks found to remove.");
+        //    }
+        //    return Ok(new
+        //    {
+        //        Message = $"{removedList.Count()} expired stocks were removed from the warehouse.",
+        //        ListOfStocks = removedList
+        //    });
+        //}
+
     }
 }

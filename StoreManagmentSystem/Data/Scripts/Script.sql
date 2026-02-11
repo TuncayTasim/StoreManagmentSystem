@@ -21,9 +21,14 @@ PRINT '--- EXECUTING TABLE SCRIPTS ---';
 :r .\Tables\Statuses.sql
 :r .\Tables\Types.sql
 :r .\Tables\Brands.sql
+:r .\Tables\Actions.sql
 :r .\Tables\Users.sql
 :r .\Tables\Products.sql
-:r .\Tables\Stocks.sql
+:r .\Tables\Warehouse.sql
+:r .\Tables\WarehouseRestocks.sql
+:r .\Tables\Shelf.sql
+:r .\Tables\ShelfRestocks.sql
+:r .\Tables\Sales.sql
 
 PRINT '--- EXECUTING SEED SCRIPTS ---';
 
@@ -31,5 +36,6 @@ PRINT '--- EXECUTING SEED SCRIPTS ---';
 :r .\Seed\InsertStatuses.sql
 :r .\Seed\InsertProductTypes.sql
 :r .\Seed\InsertBrands.sql
+:r .\Seed\InsertActions.sql
 
 PRINT '--- INSTALLATION COMPLETED SUCCESSFULLY ---';

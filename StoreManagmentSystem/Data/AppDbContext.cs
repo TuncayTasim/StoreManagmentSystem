@@ -13,7 +13,10 @@ namespace StoreManagmentSystem.Data
         public DbSet<Brand> Brands { get; set; }
         public DbSet<WarehouseRestock> WarehouseRestocks { get; set; }
         public DbSet<ShelfRestock> ShelfRestocks { get; set; }
-
+        public DbSet<Sale> Sales { get; set; }
+        public DbSet<Warehouse> Warehouse { get; set; }
+        public DbSet<Shelf> Shelf { get; set; }
+        public DbSet<Entities.Action> Actions { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
         {
@@ -24,13 +27,13 @@ namespace StoreManagmentSystem.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<WarehouseRestock>(entity =>
             {
-                entity.HasKey(e => e.WarehouseId);
+                entity.HasKey(e => e.StockId);
             });
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<ShelfRestock>(entity =>
             {
-                entity.HasKey(e => e.ShelfId);
+                entity.HasKey(e => e.ItemId);
             });
         }
     }
