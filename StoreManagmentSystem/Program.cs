@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).EnableSensitiveDataLogging());
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -49,6 +49,9 @@ builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 
 builder.Services.AddScoped<IShelfRepository, ShelfRepository>();
 builder.Services.AddScoped<IShelfService, ShelfService>();
+
+builder.Services.AddScoped<ISalesRepository, SalesRepository>();
+builder.Services.AddScoped<ISalesService, SalesService>();
 
 builder.Services.AddControllers();
 

@@ -3,6 +3,6 @@
     public class ShelfModelNoId
     {
         public decimal PriceSell { get; set; }
-        public int QuantityRestocked { get; set; }
+        public decimal RestockCurrentQuantity { get; set; }
     }
 }

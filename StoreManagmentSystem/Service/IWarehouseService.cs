@@ -5,11 +5,12 @@ namespace StoreManagmentSystem.Service
 {
     public interface IWarehouseService
     {
-        Task AddStock(WarehouseModel stock);
-        Task<WarehouseDeleteResult> DeleteStock(int StockId);
-        Task<IEnumerable<WarehouseRestock>> GetAllStocksByProductId(Guid ProductId);
-        Task<IEnumerable<WarehouseRestock>> GetAllStocksInInventory();
-        Task<WarehouseRestock> GetStockById(int StockId);
-        Task<WarehouseModel> UpdateStock(int StockId, WarehouseModelNoId stock);
+        Task Restock(WarehouseModel stock);
+        Task<IEnumerable<WarehouseModel>> GetAllRestocksByProductId(Guid ProductId);
+        Task<IEnumerable<WarehouseRestock>> GetAllRestocks();
+        Task<WarehouseRestock> GetRestockById(int StockId);
+        Task<WarehouseModel> UpdateRestock(int StockId, WarehouseModelNoId stock);
+        Task<IEnumerable<Warehouse>> GetAllStocksInWarehouse();
+        Task<Warehouse> GetRestockRecordById(int warehouseId);
     }
 }

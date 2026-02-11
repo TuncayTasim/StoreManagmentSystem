@@ -5,12 +5,16 @@ namespace StoreManagmentSystem.Repository
 {
     public interface IWarehouseRepository
     {
-        Task AddStock(WarehouseModel stock);
-        Task<WarehouseDeleteResult> DeleteStock(WarehouseRestock stock);
-        Task<IEnumerable<WarehouseRestock>> GetAllStocksByProductId(Guid ProductId);
-        Task<IEnumerable<WarehouseRestock>> GetAllStocksInInventory();
-        Task<WarehouseRestock> GetStockById(int StockId);
-        Task<WarehouseModel> GetStockModelById(int stockId);
-        Task UpdateStock(WarehouseRestock stock);
+        Task Restock(WarehouseModel stock);
+        Task<IEnumerable<WarehouseModel>> GetAllRestocksByProductId(Guid ProductId);
+        Task<IEnumerable<WarehouseRestock>> GetAllRestocks();
+        Task<WarehouseRestock> GetRestockById(int StockId);
+        Task<WarehouseModel> GetRestockModelById(int stockId);
+        Task<Warehouse> GetRestockRecordById(int warehouseId);
+        Task<IEnumerable<Warehouse>> GetAllStocksInWarehouse();
+        Task UpdateRestock(WarehouseRestock stock, Warehouse warehouseRecord);
+        WarehouseModel MapToModel(WarehouseRestock stock, Warehouse restockRecord);
+        Task<WarehouseRestock> GetStockEntityByModel(WarehouseModel stock);
+        Task<Warehouse> GetWarehouseRecordByModel(WarehouseModel stock);
     }
 }
